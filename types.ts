@@ -1,21 +1,21 @@
 export interface MarkerData {
-    id: string;
+    id: number;
     latitude: number;
     longitude: number;
-    title?: string;
-    description?: string;
+    created_at?: string;
   }
   
   export interface ImageData {
-    id: string;
+    id: number;
+    marker_id: number;
     uri: string;
-    markerId: string;
+    created_at?: string;
   }
   
   export type RootStackParamList = {
     index: undefined;
     marker: { 
-      id: string;
+      id: number;
       latitude: number;
       longitude: number;
     };

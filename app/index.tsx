@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(43, 23, 199, 0.5)', // Полупрозрачный фон
+    backgroundColor: 'rgba(43, 23, 199, 0.5)',
     zIndex: 1,
   },
 });

@@ -77,7 +77,7 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const deleteMarker = async (id: number): Promise<void> => {
     if (!db) throw new Error('База данных не инициализирована');
-    
+  
     try {
       await db.runAsync('DELETE FROM markers WHERE id = ?', [id]);
     } catch (err) {

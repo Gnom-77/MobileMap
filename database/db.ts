@@ -1,7 +1,7 @@
 import * as SQLite from 'expo-sqlite';
-import { SQLiteDatabase } from 'expo-sqlite';
+// import { SQLiteDatabase } from 'expo-sqlite';
 
-export const initDatabase = async (): Promise<SQLiteDatabase> => {
+export const initDatabase = async (): Promise<SQLite.SQLiteDatabase> => {
   try {
     const db = await SQLite.openDatabaseAsync('markers.db');
     

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, StyleSheet, View, Text, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { Alert, StyleSheet, View, Text, Image, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { useDatabase } from '../../contexts/DatabaseContext';
@@ -14,16 +14,17 @@ export default function MarkerDetails() {
   const latitude = Number(params.latitude);
   const longitude = Number(params.longitude);
 
-  const { 
-    addImage, 
-    getMarkerImages, 
-    deleteImage, 
+  const {
+    addImage,
+    getMarkerImages,
+    deleteImage,
     deleteMarker,
     getMarkers,
-    setMarkers, // Добавляем эту строку
-    error 
+    setMarkers,
+    error
   } = useDatabase();
   const [images, setImages] = useState<ImageData[]>([]);
+  const [selectedImage, setSelectedImage] = useState<ImageData | null>(null); // Состояние для выбранного изображения
 
   // Проверка валидности параметров
   if (isNaN(id) || isNaN(latitude) || isNaN(longitude)) {
@@ -73,6 +74,13 @@ export default function MarkerDetails() {
 
       if (!result.canceled) {
         const markerId = Number(id);
+
+        // Проверка на количество изображений
+        if (images.length + result.assets.length > 10) {
+          Alert.alert('Ошибка', 'Нельзя добавить больше 10 изображений к одному маркеру.');
+          return;
+        }
+
         await Promise.all(result.assets.map(asset =>
           addImage(markerId, asset.uri)
         ));
@@ -94,6 +102,7 @@ export default function MarkerDetails() {
       Alert.alert('Ошибка', 'Не удалось удалить изображение');
     }
   };
+
   const handleDeleteMarker = async () => {
     Alert.alert(
       'Удаление маркера',
@@ -144,10 +153,16 @@ export default function MarkerDetails() {
       <View style={styles.imageContainer}>
         {images.map((image) => (
           <View key={image.id} style={styles.imageWrapper}>
-            <Image source={{ uri: image.uri }} style={styles.image} />
+            <TouchableOpacity
+              onPress={() => setSelectedImage(image)}
+              style={styles.imageTouchable}
+            >
+              <Image source={{ uri: image.uri }} style={styles.image} />
+            </TouchableOpacity>
             <Text
               style={styles.deleteButton}
-              onPress={() => handleDeleteImage(image.id)}>
+              onPress={() => handleDeleteImage(image.id)}
+            >
               Удалить
             </Text>
           </View>
@@ -161,6 +176,24 @@ export default function MarkerDetails() {
       <TouchableOpacity onPress={handleDeleteMarker} style={styles.deleteMarkerButton}>
         <Text style={styles.deleteMarkerButtonText}>Удалить маркер</Text>
       </TouchableOpacity>
+
+      {/* Модальное окно для просмотра изображения */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={selectedImage !== null}
+        onRequestClose={() => setSelectedImage(null)}
+      >
+        <View style={styles.modalContainer}>
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => setSelectedImage(null)}
+          >
+            <Text style={styles.closeButtonText}>Закрыть</Text>
+          </TouchableOpacity>
+          <Image source={{ uri: selectedImage?.uri }} style={styles.modalImage} />
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
@@ -214,9 +247,14 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     marginRight: '4%',
   },
-  image: {
+  imageTouchable: {
     width: '100%',
     height: 150,
+    borderRadius: 8,
+  },
+  image: {
+    width: '100%',
+    height: '100%',
     borderRadius: 8,
   },
   deleteButton: {
@@ -252,9 +290,28 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
     marginVertical: 20
-  }
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalImage: {
+    width: '80%',
+    height: 300,
+    borderRadius: 8,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    backgroundColor: 'white',
+    padding: 10,
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: 'red',
+    fontSize: 16,
+  },
 });
-function getMarkers() {
-    throw new Error('Function not implemented.');
-}
-

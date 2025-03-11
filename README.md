@@ -1,50 +1,53 @@
-# Welcome to your Expo app 👋
+## Начать
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+1. Клонируйте репозиторий
 
-## Get started
+   ```bash
+   git clone <repository-url>
+   ```
 
-1. Install dependencies
+   ```bash
+   cd <repository-name>
+   ```
+
+2. Установите зависимости:
 
    ```bash
    npm install
    ```
 
-2. Start the app
+3. Запустите приложение:
 
    ```bash
     npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+4. Установите Expo Go на телефон
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+5. Сканируйте QR-код с помощью камеры на вашем устройстве в установленном приложении Expo Go. (Или используйте эмулятор Android/iOS)
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Принятые решения при реализации
+- Используется SQLite для локального хранения данных о маркерах и изображениях. Это обеспечивает простоту и надежность хранения данных без необходимости в интернет-соединении.
 
-## Get a fresh project
+- React Context используется для управления состоянием базы данных и предоставления методов для работы с маркерами и изображениями всем компонентам приложения.
 
-When you're ready, run:
+- Используется Expo Router для управления навигацией между экранами приложения.
 
-```bash
-npm run reset-project
-```
+- Установлено ограничение на количество изображений, связанных с одним маркером (не более 10), чтобы избежать перегрузки интерфейса и базы данных.
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Схема базы данных
 
-## Learn more
+### Таблица markers
+- id (INTEGER, PRIMARY KEY AUTOINCREMENT): Уникальный идентификатор маркера.
+- latitude (REAL NOT NULL): Широта маркера.
+- longitude (REAL NOT NULL): Долгота маркера.
+- created_at (DATETIME DEFAULT CURRENT_TIMESTAMP): Время создания маркера.
 
-To learn more about developing your project with Expo, look at the following resources:
+### Таблица marker_images
+- id (INTEGER, PRIMARY KEY AUTOINCREMENT): Уникальный идентификатор изображения.
+- marker_id (INTEGER NOT NULL): Идентификатор маркера, к которому относится изображение. Внешний ключ, ссылающийся на markers(id).
+- uri (TEXT NOT NULL): URI изображения.
+- created_at (DATETIME DEFAULT CURRENT_TIMESTAMP): Время создания изображения.
+- FOREIGN KEY (marker_id) REFERENCES markers(id) ON DELETE CASCADE: Внешний ключ, который удаляет изображения при удалении маркера.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+#### Эта схема обеспечивает связь между маркерами и их изображениями, а также автоматическое удаление изображений при удалении маркера благодаря использованию ON DELETE CASCADE.

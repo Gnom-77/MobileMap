@@ -12,11 +12,11 @@ export interface MarkerData {
     created_at?: string;
   }
   
-  export type RootStackParamList = {
-    index: undefined;
-    marker: { 
-      id: number;
-      latitude: number;
-      longitude: number;
-    };
-  };
+  // export type RootStackParamList = {
+  //   index: undefined;
+  //   marker: { 
+  //     id: number;
+  //     latitude: number;
+  //     longitude: number;
+  //   };
+  // };
